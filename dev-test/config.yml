@@ -1,268 +1,1254 @@
 backend:
-  name: test-repo
-
-site_url: https://example.com
-
+  name: github
+  repo: 29ki/temp-content
+  open_authoring: true
 publish_mode: editorial_workflow
-media_folder: assets/uploads
-
-collections: # A list of collections the CMS should be able to edit
-  - name: 'posts' # Used in routes, ie.: /admin/collections/:slug/edit
-    label: 'Posts' # Used in the UI
-    label_singular: 'Post' # Used in the UI, ie: "New Post"
-    description: >
-      The description is a great place for tone setting, high level information, and editing
-      guidelines that are specific to a collection.
-    folder: '_posts'
-    slug: '{{year}}-{{month}}-{{day}}-{{slug}}'
-    summary: '{{title}} -- {{year}}/{{month}}/{{day}}'
-    create: true # Allow users to create new documents in this collection
-    view_filters:
-      - label: Posts With Index
-        field: title
-        pattern: 'This is post #'
-      - label: Posts Without Index
-        field: title
-        pattern: front matter post
-      - label: Drafts
-        field: draft
-        pattern: true
-    view_groups:
-      - label: Year
-        field: date
-        pattern: \d{4}
-      - label: Drafts
-        field: draft
-    fields: # The fields each document in this collection have
-      - { label: 'Title', name: 'title', widget: 'string', tagname: 'h1' }
-      - { label: 'Draft', name: 'draft', widget: 'boolean', default: false }
-      - {
-          label: 'Publish Date',
-          name: 'date',
-          widget: 'datetime',
-          date_format: 'YYYY-MM-DD',
-          time_format: 'HH:mm',
-          format: 'YYYY-MM-DD HH:mm',
-        }
-      - label: 'Cover Image'
-        name: 'image'
-        widget: 'image'
-        required: false
-        tagname: ''
-
-      - { label: 'Body', name: 'body', widget: 'markdown', hint: 'Main content goes here.' }
-
-  - name: 'faq' # Used in routes, ie.: /admin/collections/:slug/edit
-    label: 'FAQ' # Used in the UI
-    folder: '_faqs'
-    create: true # Allow users to create new documents in this collection
-    fields: # The fields each document in this collection have
-      - { label: 'Question', name: 'title', widget: 'string', tagname: 'h1' }
-      - { label: 'Answer', name: 'body', widget: 'markdown' }
-
-  - name: 'settings'
-    label: 'Settings'
-    delete: false # Prevent users from deleting documents in this collection
+media_folder: media
+i18n:
+  structure: single_file
+  locales:
+    - en
+    - sv
+  default_locale: en
+collections:
+  - name: conversations
+    label: Conversations
+    label_singular: Conversation
+    folder: '/src/conversations'
+    identifier_field: id
+    extension: json
+    format: json
+    create: true
+    delete: true
+    publish: false
+    summary: '{{type}}: {{alias}}'
+    slug: '{{id}}'
     editor:
       preview: false
-    files:
-      - name: 'general'
-        label: 'Site Settings'
-        file: '_data/settings.json'
-        description: 'General Site Settings'
-        fields:
-          - { label: 'Global title', name: 'site_title', widget: 'string' }
-          - label: 'Post Settings'
-            name: posts
-            widget: 'object'
-            fields:
-              - {
-                  label: 'Number of posts on frontpage',
-                  name: front_limit,
-                  widget: number,
-                  min: 1,
-                  max: 10,
-                }
-              - { label: 'Default Author', name: author, widget: string }
-              - {
-                  label: 'Default Thumbnail',
-                  name: thumb,
-                  widget: image,
-                  class: 'thumb',
-                  required: false,
-                }
-
-      - name: 'authors'
-        label: 'Authors'
-        file: '_data/authors.yml'
-        description: 'Author descriptions'
-        fields:
-          - name: authors
-            label: Authors
-            label_singular: 'Author'
-            widget: list
-            fields:
-              - { label: 'Name', name: 'name', widget: 'string', hint: 'First and Last' }
-              - { label: 'Description', name: 'description', widget: 'markdown' }
-
-  - name: 'kitchenSink' # all the things in one entry, for documentation and quick testing
-    label: 'Kitchen Sink'
-    folder: '_sink'
-    create: true
+    sortable_fields:
+      - alias
+      - id
     fields:
-      - label: 'Related Post'
-        name: 'post'
-        widget: 'relationKitchenSinkPost'
-        collection: 'posts'
-        display_fields: ['title', 'date']
-        search_fields: ['title', 'body']
-        value_field: 'title'
-      - { label: 'Title', name: 'title', widget: 'string' }
-      - { label: 'Boolean', name: 'boolean', widget: 'boolean', default: true }
-      - { label: 'Map', name: 'map', widget: 'map' }
-      - { label: 'Text', name: 'text', widget: 'text', hint: 'Plain text, not markdown' }
-      - { label: 'Number', name: 'number', widget: 'number', hint: 'To infinity and beyond!' }
-      - { label: 'Markdown', name: 'markdown', widget: 'markdown' }
-      - { label: 'Datetime', name: 'datetime', widget: 'datetime' }
-      - { label: 'Date', name: 'date', widget: 'date' }
-      - { label: 'Color', name: 'color', widget: 'color' }
-      - {
-          label: 'Color string editable and alpha enabled',
-          name: 'colorEditable',
-          widget: 'color',
-          enableAlpha: true,
-          allowInput: true,
-        }
-      - { label: 'Image', name: 'image', widget: 'image' }
-      - { label: 'File', name: 'file', widget: 'file' }
-      - { label: 'Select', name: 'select', widget: 'select', options: ['a', 'b', 'c'] }
-      - {
-          label: 'Select multiple',
-          name: 'select_multiple',
-          widget: 'select',
-          options: ['a', 'b', 'c'],
-          multiple: true,
-        }
-      - {
-          label: 'Select numeric',
-          name: 'select_numeric',
-          widget: 'select',
-          options:
-            [{ label: 'One', value: 1 }, { label: 'Two', value: 2 }, { label: 'Three', value: 3 }],
-        }
-      - { label: 'Hidden', name: 'hidden', widget: 'hidden', default: 'hidden' }
-      - label: 'Object'
-        name: 'object'
-        widget: 'object'
-        collapsed: true
-        fields:
-          - label: 'Related Post'
-            name: 'post'
-            widget: 'relationKitchenSinkPost'
-            collection: 'posts'
-            search_fields: ['title', 'body']
-            value_field: 'title'
-          - { label: 'String', name: 'string', widget: 'string' }
-          - { label: 'Boolean', name: 'boolean', widget: 'boolean', default: false }
-          - { label: 'Text', name: 'text', widget: 'text' }
-          - { label: 'Number', name: 'number', widget: 'number' }
-          - { label: 'Markdown', name: 'markdown', widget: 'markdown' }
-          - { label: 'Datetime', name: 'datetime', widget: 'datetime' }
-          - { label: 'Date', name: 'date', widget: 'date' }
-          - { label: 'Image', name: 'image', widget: 'image' }
-          - { label: 'File', name: 'file', widget: 'file' }
-          - { label: 'Select', name: 'select', widget: 'select', options: ['a', 'b', 'c'] }
-      - label: 'List'
-        name: 'list'
-        widget: 'list'
-        fields:
-          - { label: 'String', name: 'string', widget: 'string' }
-          - { label: 'Boolean', name: 'boolean', widget: 'boolean' }
-          - { label: 'Text', name: 'text', widget: 'text' }
-          - { label: 'Number', name: 'number', widget: 'number' }
-          - { label: 'Markdown', name: 'markdown', widget: 'markdown' }
-          - { label: 'Datetime', name: 'datetime', widget: 'datetime' }
-          - { label: 'Date', name: 'date', widget: 'date' }
-          - { label: 'Image', name: 'image', widget: 'image' }
-          - { label: 'File', name: 'file', widget: 'file' }
-          - { label: 'Select', name: 'select', widget: 'select', options: ['a', 'b', 'c'] }
-          - label: 'Object'
-            name: 'object'
-            widget: 'object'
-            fields:
-              - { label: 'String', name: 'string', widget: 'string' }
-              - { label: 'Boolean', name: 'boolean', widget: 'boolean' }
-              - { label: 'Text', name: 'text', widget: 'text' }
-              - { label: 'Number', name: 'number', widget: 'number' }
-              - { label: 'Markdown', name: 'markdown', widget: 'markdown' }
-              - { label: 'Datetime', name: 'datetime', widget: 'datetime' }
-              - { label: 'Date', name: 'date', widget: 'date' }
-              - { label: 'Image', name: 'image', widget: 'image' }
-              - { label: 'File', name: 'file', widget: 'file' }
-              - { label: 'Select', name: 'select', widget: 'select', options: ['a', 'b', 'c'] }
-              - label: 'List'
-                name: 'list'
-                widget: 'list'
-                fields:
-                  - label: 'Related Post'
-                    name: 'post'
-                    widget: 'relationKitchenSinkPost'
-                    collection: 'posts'
-                    search_fields: ['title', 'body']
-                    value_field: 'title'
-                  - { label: 'String', name: 'string', widget: 'string' }
-                  - { label: 'Boolean', name: 'boolean', widget: 'boolean' }
-                  - { label: 'Text', name: 'text', widget: 'text' }
-                  - { label: 'Number', name: 'number', widget: 'number' }
-                  - { label: 'Markdown', name: 'markdown', widget: 'markdown' }
-                  - { label: 'Datetime', name: 'datetime', widget: 'datetime' }
-                  - { label: 'Date', name: 'date', widget: 'date' }
-                  - { label: 'Image', name: 'image', widget: 'image' }
-                  - { label: 'File', name: 'file', widget: 'file' }
-                  - { label: 'Select', name: 'select', widget: 'select', options: ['a', 'b', 'c'] }
-                  - { label: 'Hidden', name: 'hidden', widget: 'hidden', default: 'hidden' }
-                  - label: 'Object'
-                    name: 'object'
-                    widget: 'object'
-                    fields:
-                      - { label: 'String', name: 'string', widget: 'string' }
-                      - { label: 'Boolean', name: 'boolean', widget: 'boolean' }
-                      - { label: 'Text', name: 'text', widget: 'text' }
-                      - { label: 'Number', name: 'number', widget: 'number' }
-                      - { label: 'Markdown', name: 'markdown', widget: 'markdown' }
-                      - { label: 'Datetime', name: 'datetime', widget: 'datetime' }
-                      - { label: 'Date', name: 'date', widget: 'date' }
-                      - { label: 'Image', name: 'image', widget: 'image' }
-                      - { label: 'File', name: 'file', widget: 'file' }
-                      - {
-                          label: 'Select',
-                          name: 'select',
-                          widget: 'select',
-                          options: ['a', 'b', 'c'],
-                        }
-      - label: 'Typed List'
-        name: 'typed_list'
-        widget: 'list'
+      - label: ID
+        name: id
+        widget: uniqueId
+        i18n: duplicate
+      - label: Alias
+        hint: Will only be used and visible in the CMS
+        name: alias
+        widget: string
+        i18n: duplicate
+      - label: Type
+        name: type
+        widget: select
+        options:
+          - lesson
+          - micro-intervention
+        default: lesson
+        i18n: duplicate
+      - label: Start Section ID
+        name: root
+        widget: string
+        i18n: true
+      - label: Sections
+        name: sections
+        widget: list
+        i18n: true
         types:
-          - label: 'Type 1 Object'
-            name: 'type_1_object'
-            widget: 'object'
+          - label: Sharing exercise
+            name: sharingExercise
+            widget: object
+            summary: '{{fields.alias}} - Sharing exercise'
             fields:
-              - { label: 'String', name: 'string', widget: 'string' }
-              - { label: 'Boolean', name: 'boolean', widget: 'boolean' }
-              - { label: 'Text', name: 'text', widget: 'text' }
-          - label: 'Type 2 Object'
-            name: 'type_2_object'
-            widget: 'object'
+              - label: Section ID
+                name: id
+                widget: uniqueId
+                i18n: duplicate
+              - label: Alias
+                hint: Will only be used and visible in the CMS
+                name: alias
+                widget: string
+              - label: Example Text
+                name: exampleText
+                hint: If no posts for this exercise exists, this example is shown instead
+                  of an empty sharing wall
+                widget: string
+              - label: Question
+                name: question
+                widget: string
+              - label: Section after exercise
+                name: nextSection
+                widget: string
+                required: false
+                hint: You may leave this field empty if it is the last section of the lesson
+              - label: Conversation after exercise
+                name: nextConversation
+                widget: string
+                required: false
+                hint: You may leave this field empty if the next section is part of the
+                  current conversation
+          - label: Text and Image
+            name: editorialWithImage
+            widget: object
+            summary: '{{fields.alias}} - Text and Image'
             fields:
-              - { label: 'Number', name: 'number', widget: 'number' }
-              - { label: 'Select', name: 'select', widget: 'select', options: ['a', 'b', 'c'] }
-              - { label: 'Datetime', name: 'datetime', widget: 'datetime' }
-              - { label: 'Markdown', name: 'markdown', widget: 'markdown' }
-          - label: 'Type 3 Object'
-            name: 'type_3_object'
-            widget: 'object'
+              - label: Section ID
+                name: id
+                widget: uniqueId
+                i18n: duplicate
+              - label: Alias
+                hint: Will only be used and visible in the CMS
+                name: alias
+                widget: string
+              - label: Image URI
+                name: topImageUri
+                widget: string
+                pattern:
+                  - '^https://storage.googleapis.com/k-org-879a8.appspot.com/(.*)'
+                  - Audio/Video/Images most be located on our storage.googleapis.com content
+                    server
+                required: false
+              - label: Title
+                name: title
+                widget: string
+                required: false
+              - label: Text
+                name: content
+                widget: markdown
+                required: false
+              - label: Buttons
+                name: buttons
+                widget: list
+                summary: '{{component}}: {{content}}'
+                typeKey: component
+                types:
+                  - label: Button
+                    name: Button
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+                      - label: Navigate to conversation
+                        name: conversationId
+                        widget: relation
+                        collection: conversations
+                        display_fields:
+                          - '{{type}}: {{alias}}'
+                        value_field: id
+                        search_fields:
+                          - id
+                        required: false
+                      - label: Navigate to section
+                        name: sectionId
+                        widget: string
+                  - label: Button by Segment
+                    name: SegmentButton
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+                        hint: Default fallback when no matched segment
+                      - label: Navigate to conversation
+                        name: conversationId
+                        widget: relation
+                        collection: conversations
+                        display_fields:
+                          - '{{type}}: {{alias}}'
+                        value_field: id
+                        search_fields:
+                          - id
+                        required: false
+                        hint: Default fallback when no matched segment
+                      - label: Navigate to section
+                        name: sectionId
+                        widget: string
+                        hint: Default fallback when no matched segment
+                      - label: Segments
+                        name: segments
+                        widget: list
+                        minimize_collapsed: true
+                        summary: '{{segment}} {{content}}'
+                        fields:
+                          - label: Segment
+                            name: segment
+                            widget: select
+                            multiple: false
+                            options:
+                              - YOUNG_ADULTS
+                              - ADULTS
+                              - ALL
+                              - KI
+                              - 8be51700-fd9d-43d3-a01a-3963782535df
+                          - label: Content
+                            name: content
+                            widget: string
+                          - label: Navigate to conversation
+                            name: conversationId
+                            widget: relation
+                            collection: conversations
+                            display_fields:
+                              - '{{type}}: {{alias}}'
+                            value_field: id
+                            search_fields:
+                              - id
+                            required: false
+                          - label: Navigate to section
+                            name: sectionId
+                            widget: string
+                  - label: Next Conversation Button
+                    name: NextConversationButton
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+                      - label: Navigate to conversation
+                        name: conversationId
+                        widget: relation
+                        collection: conversations
+                        display_fields:
+                          - '{{type}}: {{alias}}'
+                        value_field: id
+                        search_fields:
+                          - id
+                        required: false
+                      - label: Navigate to section
+                        name: sectionId
+                        widget: string
+                  - label: Exercise Complete Button
+                    name: ExerciseCompleteButton
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+                  - label: Lesson Complete Button
+                    name: LessonCompleteButton
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+          - label: Writing exercise
+            name: writing
+            widget: object
+            summary: '{{fields.alias}} - Writing exercise'
             fields:
-              - { label: 'Date', name: 'date', widget: 'date' }
-              - { label: 'Image', name: 'image', widget: 'image' }
-              - { label: 'File', name: 'file', widget: 'file' }
+              - label: Section ID
+                name: id
+                widget: uniqueId
+                i18n: duplicate
+              - label: Alias
+                hint: Will only be used and visible in the CMS
+                name: alias
+                widget: string
+              - label: Title
+                name: title
+                widget: string
+                required: false
+              - label: Time
+                name: time
+                widget: string
+                required: false
+              - label: Question
+                name: question
+                widget: string
+                required: false
+              - label: Short description
+                name: shortDescription
+                widget: string
+                required: false
+              - label: Long description
+                name: longDescription
+                widget: markdown
+                required: false
+              - label: Buttons
+                name: buttons
+                widget: list
+                summary: '{{component}}: {{content}}'
+                typeKey: component
+                types:
+                  - label: Button
+                    name: Button
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+                      - label: Navigate to conversation
+                        name: conversationId
+                        widget: relation
+                        collection: conversations
+                        display_fields:
+                          - '{{type}}: {{alias}}'
+                        value_field: id
+                        search_fields:
+                          - id
+                        required: false
+                      - label: Navigate to section
+                        name: sectionId
+                        widget: string
+                  - label: Button by Segment
+                    name: SegmentButton
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+                        hint: Default fallback when no matched segment
+                      - label: Navigate to conversation
+                        name: conversationId
+                        widget: relation
+                        collection: conversations
+                        display_fields:
+                          - '{{type}}: {{alias}}'
+                        value_field: id
+                        search_fields:
+                          - id
+                        required: false
+                        hint: Default fallback when no matched segment
+                      - label: Navigate to section
+                        name: sectionId
+                        widget: string
+                        hint: Default fallback when no matched segment
+                      - label: Segments
+                        name: segments
+                        widget: list
+                        minimize_collapsed: true
+                        summary: '{{segment}} {{content}}'
+                        fields:
+                          - label: Segment
+                            name: segment
+                            widget: select
+                            multiple: false
+                            options:
+                              - YOUNG_ADULTS
+                              - ADULTS
+                              - ALL
+                              - KI
+                              - 8be51700-fd9d-43d3-a01a-3963782535df
+                          - label: Content
+                            name: content
+                            widget: string
+                          - label: Navigate to conversation
+                            name: conversationId
+                            widget: relation
+                            collection: conversations
+                            display_fields:
+                              - '{{type}}: {{alias}}'
+                            value_field: id
+                            search_fields:
+                              - id
+                            required: false
+                          - label: Navigate to section
+                            name: sectionId
+                            widget: string
+                  - label: Next Conversation Button
+                    name: NextConversationButton
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+                      - label: Navigate to conversation
+                        name: conversationId
+                        widget: relation
+                        collection: conversations
+                        display_fields:
+                          - '{{type}}: {{alias}}'
+                        value_field: id
+                        search_fields:
+                          - id
+                        required: false
+                      - label: Navigate to section
+                        name: sectionId
+                        widget: string
+                  - label: Exercise Complete Button
+                    name: ExerciseCompleteButton
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+                  - label: Lesson Complete Button
+                    name: LessonCompleteButton
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+          - label: Audio player
+            name: audio
+            widget: object
+            summary: '{{fields.alias}} - Audio player'
+            fields:
+              - label: Section ID
+                name: id
+                widget: uniqueId
+                i18n: duplicate
+              - label: Alias
+                hint: Will only be used and visible in the CMS
+                name: alias
+                widget: string
+              - label: Title
+                name: title
+                widget: string
+                required: false
+              - label: Description
+                name: description
+                widget: markdown
+                required: false
+              - label: Audio URI
+                name: audioUri
+                widget: string
+                pattern:
+                  - '^https://storage.googleapis.com/k-org-879a8.appspot.com/(.*)'
+                  - Audio/Video/Images most be located on our storage.googleapis.com content
+                    server
+              - label: Buttons
+                name: buttons
+                widget: list
+                summary: '{{component}}: {{content}}'
+                typeKey: component
+                types:
+                  - label: Button
+                    name: Button
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+                      - label: Navigate to conversation
+                        name: conversationId
+                        widget: relation
+                        collection: conversations
+                        display_fields:
+                          - '{{type}}: {{alias}}'
+                        value_field: id
+                        search_fields:
+                          - id
+                        required: false
+                      - label: Navigate to section
+                        name: sectionId
+                        widget: string
+                  - label: Button by Segment
+                    name: SegmentButton
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+                        hint: Default fallback when no matched segment
+                      - label: Navigate to conversation
+                        name: conversationId
+                        widget: relation
+                        collection: conversations
+                        display_fields:
+                          - '{{type}}: {{alias}}'
+                        value_field: id
+                        search_fields:
+                          - id
+                        required: false
+                        hint: Default fallback when no matched segment
+                      - label: Navigate to section
+                        name: sectionId
+                        widget: string
+                        hint: Default fallback when no matched segment
+                      - label: Segments
+                        name: segments
+                        widget: list
+                        minimize_collapsed: true
+                        summary: '{{segment}} {{content}}'
+                        fields:
+                          - label: Segment
+                            name: segment
+                            widget: select
+                            multiple: false
+                            options:
+                              - YOUNG_ADULTS
+                              - ADULTS
+                              - ALL
+                              - KI
+                              - 8be51700-fd9d-43d3-a01a-3963782535df
+                          - label: Content
+                            name: content
+                            widget: string
+                          - label: Navigate to conversation
+                            name: conversationId
+                            widget: relation
+                            collection: conversations
+                            display_fields:
+                              - '{{type}}: {{alias}}'
+                            value_field: id
+                            search_fields:
+                              - id
+                            required: false
+                          - label: Navigate to section
+                            name: sectionId
+                            widget: string
+                  - label: Next Conversation Button
+                    name: NextConversationButton
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+                      - label: Navigate to conversation
+                        name: conversationId
+                        widget: relation
+                        collection: conversations
+                        display_fields:
+                          - '{{type}}: {{alias}}'
+                        value_field: id
+                        search_fields:
+                          - id
+                        required: false
+                      - label: Navigate to section
+                        name: sectionId
+                        widget: string
+                  - label: Exercise Complete Button
+                    name: ExerciseCompleteButton
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+                  - label: Lesson Complete Button
+                    name: LessonCompleteButton
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+          - label: Video player
+            name: video
+            widget: object
+            summary: '{{fields.alias}} - Video player'
+            fields:
+              - label: Section ID
+                name: id
+                widget: uniqueId
+                i18n: duplicate
+              - label: Alias
+                hint: Will only be used and visible in the CMS
+                name: alias
+                widget: string
+              - label: Title
+                name: title
+                widget: string
+                required: false
+              - label: Description
+                name: description
+                widget: markdown
+                required: false
+              - label: Image URI
+                name: imageUri
+                widget: string
+                pattern:
+                  - '^https://storage.googleapis.com/k-org-879a8.appspot.com/(.*)'
+                  - Audio/Video/Images most be located on our storage.googleapis.com content
+                    server
+              - label: Video URI
+                name: videoUri
+                widget: string
+                pattern:
+                  - '^https://storage.googleapis.com/k-org-879a8.appspot.com/(.*)'
+                  - Audio/Video/Images most be located on our storage.googleapis.com content
+                    server
+              - label: Buttons
+                name: buttons
+                widget: list
+                summary: '{{component}}: {{content}}'
+                typeKey: component
+                types:
+                  - label: Button
+                    name: Button
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+                      - label: Navigate to conversation
+                        name: conversationId
+                        widget: relation
+                        collection: conversations
+                        display_fields:
+                          - '{{type}}: {{alias}}'
+                        value_field: id
+                        search_fields:
+                          - id
+                        required: false
+                      - label: Navigate to section
+                        name: sectionId
+                        widget: string
+                  - label: Button by Segment
+                    name: SegmentButton
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+                        hint: Default fallback when no matched segment
+                      - label: Navigate to conversation
+                        name: conversationId
+                        widget: relation
+                        collection: conversations
+                        display_fields:
+                          - '{{type}}: {{alias}}'
+                        value_field: id
+                        search_fields:
+                          - id
+                        required: false
+                        hint: Default fallback when no matched segment
+                      - label: Navigate to section
+                        name: sectionId
+                        widget: string
+                        hint: Default fallback when no matched segment
+                      - label: Segments
+                        name: segments
+                        widget: list
+                        minimize_collapsed: true
+                        summary: '{{segment}} {{content}}'
+                        fields:
+                          - label: Segment
+                            name: segment
+                            widget: select
+                            multiple: false
+                            options:
+                              - YOUNG_ADULTS
+                              - ADULTS
+                              - ALL
+                              - KI
+                              - 8be51700-fd9d-43d3-a01a-3963782535df
+                          - label: Content
+                            name: content
+                            widget: string
+                          - label: Navigate to conversation
+                            name: conversationId
+                            widget: relation
+                            collection: conversations
+                            display_fields:
+                              - '{{type}}: {{alias}}'
+                            value_field: id
+                            search_fields:
+                              - id
+                            required: false
+                          - label: Navigate to section
+                            name: sectionId
+                            widget: string
+                  - label: Next Conversation Button
+                    name: NextConversationButton
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+                      - label: Navigate to conversation
+                        name: conversationId
+                        widget: relation
+                        collection: conversations
+                        display_fields:
+                          - '{{type}}: {{alias}}'
+                        value_field: id
+                        search_fields:
+                          - id
+                        required: false
+                      - label: Navigate to section
+                        name: sectionId
+                        widget: string
+                  - label: Exercise Complete Button
+                    name: ExerciseCompleteButton
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+                  - label: Lesson Complete Button
+                    name: LessonCompleteButton
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+          - label: Micro Intervention Day
+            name: microInterventionDay
+            widget: object
+            summary: '{{fields.alias}} - Micro Intervention Day'
+            fields:
+              - label: Section ID
+                name: id
+                widget: uniqueId
+                i18n: duplicate
+              - label: Alias
+                hint: Will only be used and visible in the CMS
+                name: alias
+                widget: string
+              - label: Welcome Heading
+                name: welcomeHeading
+                widget: string
+                required: false
+              - label: Lesson Last Day
+                name: lessonlastDay
+                widget: boolean
+                default: false
+              - label: Lesson First Day
+                name: initialDay
+                widget: boolean
+                default: false
+              - label: Task
+                name: task
+                widget: object
+                summary: '{{fields.id}} - {{fields.title}}'
+                fields:
+                  - label: ID
+                    name: id
+                    widget: string
+                  - label: Days
+                    name: days
+                    widget: number
+                  - label: Hours
+                    name: hours
+                    widget: number
+                    min: 0
+                    max: 23
+                  - label: Minutes
+                    name: minutes
+                    widget: number
+                    min: 0
+                    max: 59
+                  - label: Title
+                    name: title
+                    widget: string
+                  - label: Body
+                    name: body
+                    widget: markdown
+              - label: Follow Up
+                name: followUp
+                widget: object
+                summary: '{{fields.id}} - {{fields.title}}'
+                fields:
+                  - label: Days
+                    name: days
+                    widget: number
+                  - label: Hours
+                    name: hours
+                    widget: number
+                    options:
+                      min: 0
+                      max: 23
+                  - label: Minutes
+                    name: minutes
+                    widget: number
+                    options:
+                      min: 0
+                      max: 59
+                  - label: Title
+                    name: title
+                    widget: string
+                  - label: Body
+                    name: body
+                    widget: markdown
+              - label: Navigate to conversation
+                name: nextConversationId
+                widget: relation
+                collection: conversations
+                display_fields:
+                  - '{{type}}: {{alias}}'
+                value_field: id
+                search_fields:
+                  - id
+                required: false
+              - label: Navigate to section
+                name: nextSectionId
+                widget: string
+          - label: Section
+            name: defaultSection
+            widget: object
+            summary: '{{fields.alias}} - Section'
+            fields:
+              - label: Section ID
+                name: id
+                widget: uniqueId
+                i18n: duplicate
+              - label: Alias
+                hint: Will only be used and visible in the CMS
+                name: alias
+                widget: string
+              - label: Content
+                name: content
+                widget: list
+                typeKey: component
+                summary: '{{component}}'
+                i18n: true
+                types:
+                  - label: Audio Player
+                    name: AudioPlayer
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: object
+                        fields:
+                          - label: Audio URI
+                            name: uri
+                            widget: string
+                            pattern:
+                              - '^https://storage.googleapis.com/k-org-879a8.appspot.com/(.*)'
+                              - Audio/Video/Images most be located on our storage.googleapis.com
+                                content server
+                          - label: Duration
+                            name: duration
+                            widget: number
+                            value_type: int
+                  - label: Breathing Animation
+                    name: BreathingAnimation
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: object
+                        required: false
+                  - label: Button
+                    name: Button
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+                      - label: Navigate to conversation
+                        name: conversationId
+                        widget: relation
+                        collection: conversations
+                        display_fields:
+                          - '{{type}}: {{alias}}'
+                        value_field: id
+                        search_fields:
+                          - id
+                        required: false
+                      - label: Navigate to section
+                        name: sectionId
+                        widget: string
+                  - label: Button Group
+                    name: ButtonGroup
+                    widget: object
+                    fields:
+                      - label: Buttons
+                        name: content
+                        widget: list
+                        summary: '{{component}}: {{content}}'
+                        typeKey: component
+                        types:
+                          - label: Button
+                            name: Button
+                            widget: object
+                            fields:
+                              - label: Content
+                                name: content
+                                widget: string
+                              - label: Navigate to conversation
+                                name: conversationId
+                                widget: relation
+                                collection: conversations
+                                display_fields:
+                                  - '{{type}}: {{alias}}'
+                                value_field: id
+                                search_fields:
+                                  - id
+                                required: false
+                              - label: Navigate to section
+                                name: sectionId
+                                widget: string
+                          - label: Button by Segment
+                            name: SegmentButton
+                            widget: object
+                            fields:
+                              - label: Content
+                                name: content
+                                widget: string
+                                hint: Default fallback when no matched segment
+                              - label: Navigate to conversation
+                                name: conversationId
+                                widget: relation
+                                collection: conversations
+                                display_fields:
+                                  - '{{type}}: {{alias}}'
+                                value_field: id
+                                search_fields:
+                                  - id
+                                required: false
+                                hint: Default fallback when no matched segment
+                              - label: Navigate to section
+                                name: sectionId
+                                widget: string
+                                hint: Default fallback when no matched segment
+                              - label: Segments
+                                name: segments
+                                widget: list
+                                minimize_collapsed: true
+                                summary: '{{segment}} {{content}}'
+                                fields:
+                                  - label: Segment
+                                    name: segment
+                                    widget: select
+                                    multiple: false
+                                    options:
+                                      - YOUNG_ADULTS
+                                      - ADULTS
+                                      - ALL
+                                      - KI
+                                      - 8be51700-fd9d-43d3-a01a-3963782535df
+                                  - label: Content
+                                    name: content
+                                    widget: string
+                                  - label: Navigate to conversation
+                                    name: conversationId
+                                    widget: relation
+                                    collection: conversations
+                                    display_fields:
+                                      - '{{type}}: {{alias}}'
+                                    value_field: id
+                                    search_fields:
+                                      - id
+                                    required: false
+                                  - label: Navigate to section
+                                    name: sectionId
+                                    widget: string
+                          - label: Next Conversation Button
+                            name: NextConversationButton
+                            widget: object
+                            fields:
+                              - label: Content
+                                name: content
+                                widget: string
+                              - label: Navigate to conversation
+                                name: conversationId
+                                widget: relation
+                                collection: conversations
+                                display_fields:
+                                  - '{{type}}: {{alias}}'
+                                value_field: id
+                                search_fields:
+                                  - id
+                                required: false
+                              - label: Navigate to section
+                                name: sectionId
+                                widget: string
+                          - label: Exercise Complete Button
+                            name: ExerciseCompleteButton
+                            widget: object
+                            fields:
+                              - label: Content
+                                name: content
+                                widget: string
+                          - label: Lesson Complete Button
+                            name: LessonCompleteButton
+                            widget: object
+                            fields:
+                              - label: Content
+                                name: content
+                                widget: string
+                  - label: Exercise
+                    name: Exercise
+                    widget: object
+                    fields:
+                      - label: Exercise ID
+                        name: exerciseId
+                        widget: string
+                      - label: Title
+                        name: exerciseTitle
+                        widget: string
+                      - label: Content
+                        name: content
+                        widget: list
+                        summary: '{{component}}'
+                        typeKey: component
+                        types:
+                          - label: Text Group
+                            name: TextGroup
+                            widget: object
+                            fields:
+                              - label: Content
+                                name: content
+                                widget: list
+                                summary: '{{component}}: {{content}}'
+                                typeKey: component
+                                types:
+                                  - label: Text
+                                    name: Text
+                                    widget: object
+                                    fields:
+                                      - label: Content
+                                        name: content
+                                        widget: markdown
+                                  - label: Subtitle
+                                    name: Subtitle
+                                    widget: object
+                                    fields:
+                                      - label: Content
+                                        name: content
+                                        widget: string
+                                  - label: Small Print
+                                    name: SmallPrint
+                                    widget: object
+                                    fields:
+                                      - label: Content
+                                        name: content
+                                        widget: markdown
+                                  - label: Quote
+                                    name: Quote
+                                    widget: object
+                                    fields:
+                                      - label: Content
+                                        name: content
+                                        widget: text
+                  - label: Exercise Carousel
+                    name: ExerciseCarousel
+                    widget: object
+                    fields:
+                      - label: Properties
+                        name: props
+                        widget: object
+                        fields:
+                          - label: Category
+                            name: category
+                            widget: string
+                  - label: Exercise Complete Button
+                    name: ExerciseCompleteButton
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+                  - label: Exercise Review
+                    name: ExerciseReview
+                    widget: object
+                    fields:
+                      - label: Properties
+                        name: props
+                        widget: object
+                        fields:
+                          - label: Key
+                            name: key
+                            widget: string
+                  - label: Header Image
+                    name: HeaderImage
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: object
+                        fields:
+                          - label: URI
+                            name: uri
+                            widget: string
+                            pattern:
+                              - '^https://storage.googleapis.com/k-org-879a8.appspot.com/(.*)'
+                              - Audio/Video/Images most be located on our storage.googleapis.com
+                                content server
+                  - label: Input
+                    name: Input
+                    widget: object
+                    fields:
+                      - label: ConversationID
+                        name: conversationId
+                        widget: string
+                      - label: SectionID Key
+                        name: sectionId
+                        widget: string
+                      - label: Properties
+                        name: props
+                        widget: object
+                        fields:
+                          - label: key
+                            name: key
+                            widget: string
+                  - label: Image
+                    name: Image
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: object
+                        fields:
+                          - label: URL
+                            name: url
+                            widget: string
+                            pattern:
+                              - '^https://storage.googleapis.com/k-org-879a8.appspot.com/(.*)'
+                              - Audio/Video/Images most be located on our storage.googleapis.com
+                                content server
+                  - label: Lesson Complete Button
+                    name: LessonCompleteButton
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+                  - label: MultiSelect
+                    name: MultiSelect
+                    widget: object
+                    fields:
+                      - label: Options
+                        name: options
+                        widget: tags
+                        i18n: true
+                      - label: Storage Key
+                        widget: string
+                        name: storageKey
+                        required: true
+                        hint:
+                          This key is used to identify this particular instance of a multi-select.
+                          This allows you to have several multi-selects in the same conversation
+                      - label: Max Selections
+                        widget: string
+                        name: maxSelections
+                        required: true
+                        hint: The maximum number of options that the user can select
+                  - label: MultiSelectResult
+                    name: MultiSelectResult
+                    widget: object
+                    fields:
+                      - label: Storage Key
+                        name: storageKey
+                        widget: string
+                        hint: The key that identifies a specific instance of a MultiSelect
+                        required: true
+                  - label: Next Conversation Button
+                    name: NextConversationButton
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+                      - label: Navigate to conversation
+                        name: conversationId
+                        widget: relation
+                        collection: conversations
+                        display_fields:
+                          - '{{type}}: {{alias}}'
+                        value_field: id
+                        search_fields:
+                          - id
+                        required: false
+                      - label: Navigate to section
+                        name: sectionId
+                        widget: string
+                  - label: Quote
+                    name: Quote
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: text
+                  - label: Small Print
+                    name: SmallPrint
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: markdown
+                  - label: Submit Sharing Button
+                    name: submitSharingButton
+                    widget: object
+                    fields:
+                      - label: Label
+                        name: content
+                        widget: string
+                      - label: ConversationID
+                        name: conversationId
+                        widget: string
+                      - label: SectionID Key
+                        name: sectionId
+                        widget: string
+                      - label: Properties
+                        name: props
+                        widget: object
+                        fields:
+                          - label: Key
+                            name: key
+                            widget: string
+                          - label: Category
+                            name: category
+                            widget: string
+                  - label: Subtitle
+                    name: Subtitle
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: string
+                  - label: Text
+                    name: Text
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: markdown
+                  - label: Text Group
+                    name: TextGroup
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: list
+                        summary: '{{component}}: {{content}}'
+                        typeKey: component
+                        types:
+                          - label: Text
+                            name: Text
+                            widget: object
+                            fields:
+                              - label: Content
+                                name: content
+                                widget: markdown
+                          - label: Subtitle
+                            name: Subtitle
+                            widget: object
+                            fields:
+                              - label: Content
+                                name: content
+                                widget: string
+                          - label: Small Print
+                            name: SmallPrint
+                            widget: object
+                            fields:
+                              - label: Content
+                                name: content
+                                widget: markdown
+                          - label: Quote
+                            name: Quote
+                            widget: object
+                            fields:
+                              - label: Content
+                                name: content
+                                widget: text
+                  - label: Video Stories
+                    name: VideoStories
+                    widget: object
+                    fields:
+                      - label: Content
+                        name: content
+                        widget: list
+                        summary: '{{title}}'
+                        fields:
+                          - label: Title
+                            name: title
+                            widget: string
+                            required: false
+                          - label: Duration
+                            name: duration
+                            widget: number
+                            value_type: int
+                          - label: Video URI
+                            name: videoUri
+                            widget: string
+                            pattern:
+                              - '^https://storage.googleapis.com/k-org-879a8.appspot.com/(.*)'
+                              - Audio/Video/Images most be located on our storage.googleapis.com
+                                content server
+                          - label: Image URI
+                            name: imageUri
+                            widget: string
+    i18n: true
